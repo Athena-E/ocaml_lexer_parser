@@ -39,7 +39,7 @@ let is_nat_digit = function '0' .. '9' -> true | _ -> false
 
 type token = 
   | NUM of float 
-  | MINUS
+  | SUB
   | ADD
   | POW 
   | COS
@@ -53,7 +53,7 @@ type state =
   | ACCEPT
 
 let token_map = StringMap.of_seq @@ List.to_seq [ 
-    ("-", MINUS);
+    ("-", SUB);
     ("+", ADD);
     ("^", POW);
     ("cos", COS);
@@ -251,15 +251,15 @@ let rec get_num_prod tks =
   match tks with 
   | [] -> []
   | NUM f::t -> Production (NT F, [Te (NUM f)]) :: 
-                Production (NT F, [Te ADD; Te (NUM f)]) :: 
-                Production (NT F, [Te MINUS; Te (NUM f)]) :: 
+                Production (NT F, [Te ADD; Te (NUM f)]) ::
+                Production (NT F, [Te SUB; Te (NUM f)]) ::
                 get_num_prod t
   | _::t -> get_num_prod t 
 
 let grammar tks = [ 
   Production (NT Z, [NT E; Te END]);
   Production (NT E, [NT T; NT E']);
-  Production (NT E', [Te MINUS; NT T; NT E']);
+  Production (NT E', [Te SUB; NT T; NT E']);
   Production (NT E', [Te EPS]);
   Production (NT T, [NT R; NT T']);
   Production (NT T', [Te ADD; NT R; NT T']);
@@ -268,7 +268,8 @@ let grammar tks = [
   Production (NT R, [NT C; Te POW; NT R]);
   Production (NT C, [NT X]);
   Production (NT C, [Te COS; NT C]);
-  Production (NT F, [NT X; Te FACT]); 
+  Production (NT X, [NT X; Te FACT]); 
+  Production (NT X, [NT F])
 ] @ get_num_prod tks
   
 (* Define types for ACTION and GOTO tables *)
@@ -312,7 +313,7 @@ let rec get_prod_in_grammar nt grammar =
 (*generate lookahead*)
 let rec gen_las next la grammar = 
   match next with
-  | [] | [Te SKIP] | [Te EPS] ->
+  | [] | [Te EPS] ->
       (match la with
        | Some t -> [t]
        | None -> raise Err
@@ -351,7 +352,7 @@ let rec get_dot_sym dot_pos syms =
   try
     List.nth syms dot_pos
   with 
-  | (Failure nth) -> Te END (*SKIP - get_trans_syms depends on this*)
+  | (Failure nth) -> Te END 
 
 let rec closure items grammar = 
   let rec aux items =
@@ -397,7 +398,7 @@ let string_of_non_terminal = function
 (* Convert token to string *)
 let string_of_token = function
   | NUM f -> Printf.sprintf "NUM(%f)" f
-  | MINUS -> "MINUS"
+  | SUB -> "SUB"
   | ADD -> "ADD"
   | POW -> "POW"
   | COS -> "COS"
@@ -442,7 +443,7 @@ let get_next_sets set =
         match h.production with
         | Production (_, xs) -> 
             let dot_sym = get_dot_sym (h.dot_position) xs in
-            if dot_sym = Te END || dot_sym = Te SKIP then aux t dfa_states 
+            if dot_sym = Te END || dot_sym = Te EPS then aux t dfa_states 
             else
               let new_item = {production = h.production; dot_position = h.dot_position+1; lookahead = h.lookahead} in
               let new_dfa_states = add_item_to_state new_item dot_sym dfa_states in 
@@ -608,13 +609,24 @@ let base_item = {
   lookahead = Some END;
 }
 
-let is_accepted init s = 
+(*TODO: generate parse tree*) 
+
+type 'a tree = Br of 'a * 'a tree list
+
+let make_branch sym stack n = Br (sym, take n stack)                       
+
+let gen_parse_tree s = 
+  let init = { 
+    production = Production (NT Z, [NT E; Te END]);
+    dot_position = 0;
+    lookahead = Some END;
+  } in
   let syms = lex s in
   let g = grammar (get_nums syms) in
   let sym_list = to_sym_list syms in
   let action_tbl = get_action g init in
-  let goto_tbl = get_goto g init in
-  let rec aux state_stack sym_stack syms =
+  let goto_tbl = get_goto g init in 
+  let rec aux state_stack sym_stack syms tree_stack =
     match state_stack, sym_stack, syms with 
     | x::xs, _, z::zs -> 
         print_int_list state_stack;
@@ -627,38 +639,32 @@ let is_accepted init s =
           | SHIFT n ->
               print_endline "shift";
               print_endline "";
-              aux (n::state_stack) (z::sym_stack) zs
+              aux (n::state_stack) (z::sym_stack) zs ((Br (z, []))::tree_stack)
           | REDUCE(m, nt) ->
               print_endline ("reduce "^(string_of_int m));
               (match drop m state_stack with
                | st::sts ->
                    let goto_state = GotoMap.find (st, nt) goto_tbl in 
-                   aux (goto_state::(st::sts)) (nt::(drop m sym_stack)) syms
+                   aux (goto_state::(st::sts)) (nt::(drop m sym_stack)) syms (Br (nt, take m tree_stack)::(drop m tree_stack))
                | _ -> raise Err)
-          | ACCEPT -> ACCEPT 
+          | ACCEPT -> tree_stack (*ACCEPT*) 
           | _ -> raise Err
         in aux' 
     | _, _, _ -> raise Err
-  in aux [0] [] sym_list
+  in aux [0] [] sym_list [] 
+
+
+let rec string_of_tree (Br (value, children)) indent =
+  let prefix = String.make indent ' ' in
+  let children_str = List.map (fun child -> string_of_tree child (indent + 2)) children in
+  prefix ^ (string_of_symbol value) ^ "\n" ^ (String.concat "" children_str) 
   
-    
-(*TODO: generate parse tree*) 
-
-type 'a tree = Lf | Br of 'a * 'a tree * 'a tree * 'a tree 
-                            
+let print_tree t = print_string (string_of_tree (List.nth t 0) 0)                                             
 
 
 
-let get_parse_tree s =
-  let syms = lex s in
-  let g = grammar (get_nums syms) in
-  g
-
-    
-
-let myg = grammar ([NUM 0.0])
-    
 
 
-    
+
+
     
