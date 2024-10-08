@@ -1,0 +1,124 @@
+# gen_parse_tree "+1+0" ;;
+
+state stack: 0 
+symbol stack: []
+next symbol: ADD
+SHIFT
+
+state stack: 4 0 
+symbol stack: [ADD]
+next symbol: NUM(1.000000)
+SHIFT
+
+state stack: 20 4 0 
+symbol stack: [NUM(1.000000), ADD]
+next symbol: ADD
+REDUCE 2
+
+state stack: 6 0 
+symbol stack: [F]
+next symbol: ADD
+REDUCE 1
+
+state stack: 7 0 
+symbol stack: [X]
+next symbol: ADD
+REDUCE 1
+
+state stack: 8 0 
+symbol stack: [C]
+next symbol: ADD
+REDUCE 1
+
+state stack: 9 0 
+symbol stack: [R]
+next symbol: ADD
+REDUCE 0
+
+state stack: 15 9 0 
+symbol stack: [T', R]
+next symbol: ADD
+REDUCE 2
+
+state stack: 10 0 
+symbol stack: [T]
+next symbol: ADD
+SHIFT
+
+state stack: 12 10 0 
+symbol stack: [ADD, T]
+next symbol: NUM(0.000000)
+SHIFT
+
+state stack: 2 12 10 0 
+symbol stack: [NUM(0.000000), ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 6 12 10 0 
+symbol stack: [F, ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 7 12 10 0 
+symbol stack: [X, ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 8 12 10 0 
+symbol stack: [C, ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 9 12 10 0 
+symbol stack: [R, ADD, T]
+next symbol: END
+REDUCE 0
+
+state stack: 15 9 12 10 0 
+symbol stack: [T', R, ADD, T]
+next symbol: END
+REDUCE 2
+
+state stack: 23 12 10 0 
+symbol stack: [T, ADD, T]
+next symbol: END
+REDUCE 0
+
+state stack: 26 23 12 10 0 
+symbol stack: [E', T, ADD, T]
+next symbol: END
+REDUCE 3
+
+state stack: 13 10 0 
+symbol stack: [E', T]
+next symbol: END
+REDUCE 2
+
+state stack: 11 0 
+symbol stack: [E]
+next symbol: END
+ACCEPT
+
+Parse tree:
+E
+  E'
+    E'
+    T
+      T'
+      R
+        C
+          X
+            F
+              NUM(0.000000)
+    ADD
+  T
+    T'
+    R
+      C
+        X
+          F
+            NUM(1.000000)
+            ADD
+
+- : unit = ()

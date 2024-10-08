@@ -258,10 +258,10 @@ let rec get_num_prod tks =
 let grammar tks = [ 
   Production (NT Z, [NT E; Te END]);
   Production (NT E, [NT T; NT E']);
-  Production (NT E', [Te SUB; NT T; NT E']);
+  Production (NT E', [Te ADD; NT T; NT E']);
   Production (NT E', [Te EPS]);
   Production (NT T, [NT R; NT T']);
-  Production (NT T', [Te ADD; NT R; NT T']);
+  Production (NT T', [Te SUB; NT R; NT T']);
   Production (NT T', [Te EPS]);
   Production (NT R, [NT C]);
   Production (NT R, [NT C; Te POW; NT R]);
@@ -660,5 +660,4 @@ let gen_parse_tree s =
           | _ -> raise Err
         in aux' 
     | _, _, _ -> raise Err
-  in aux [0] [] sym_list [] 
-   
+  in aux [0] [] sym_list []

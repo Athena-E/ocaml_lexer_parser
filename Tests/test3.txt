@@ -1,0 +1,221 @@
+# gen_parse_tree "1 + 2^3 - cos 4!" ;;
+
+state stack: 0 
+symbol stack: []
+next symbol: NUM(1.000000)
+SHIFT
+
+state stack: 4 0 
+symbol stack: [NUM(1.000000)]
+next symbol: ADD
+REDUCE 1
+
+state stack: 8 0 
+symbol stack: [F]
+next symbol: ADD
+REDUCE 1
+
+state stack: 9 0 
+symbol stack: [X]
+next symbol: ADD
+REDUCE 1
+
+state stack: 10 0 
+symbol stack: [C]
+next symbol: ADD
+REDUCE 1
+
+state stack: 11 0 
+symbol stack: [R]
+next symbol: ADD
+REDUCE 0
+
+state stack: 17 11 0 
+symbol stack: [T', R]
+next symbol: ADD
+REDUCE 2
+
+state stack: 12 0 
+symbol stack: [T]
+next symbol: ADD
+SHIFT
+
+state stack: 14 12 0 
+symbol stack: [ADD, T]
+next symbol: NUM(2.000000)
+SHIFT
+
+state stack: 3 14 12 0 
+symbol stack: [NUM(2.000000), ADD, T]
+next symbol: POW
+REDUCE 1
+
+state stack: 8 14 12 0 
+symbol stack: [F, ADD, T]
+next symbol: POW
+REDUCE 1
+
+state stack: 9 14 12 0 
+symbol stack: [X, ADD, T]
+next symbol: POW
+REDUCE 1
+
+state stack: 10 14 12 0 
+symbol stack: [C, ADD, T]
+next symbol: POW
+SHIFT
+
+state stack: 18 10 14 12 0 
+symbol stack: [POW, C, ADD, T]
+next symbol: NUM(3.000000)
+SHIFT
+
+state stack: 2 18 10 14 12 0 
+symbol stack: [NUM(3.000000), POW, C, ADD, T]
+next symbol: SUB
+REDUCE 1
+
+state stack: 8 18 10 14 12 0 
+symbol stack: [F, POW, C, ADD, T]
+next symbol: SUB
+REDUCE 1
+
+state stack: 9 18 10 14 12 0 
+symbol stack: [X, POW, C, ADD, T]
+next symbol: SUB
+REDUCE 1
+
+state stack: 10 18 10 14 12 0 
+symbol stack: [C, POW, C, ADD, T]
+next symbol: SUB
+REDUCE 1
+
+state stack: 31 18 10 14 12 0 
+symbol stack: [R, POW, C, ADD, T]
+next symbol: SUB
+REDUCE 3
+
+state stack: 11 14 12 0 
+symbol stack: [R, ADD, T]
+next symbol: SUB
+SHIFT
+
+state stack: 16 11 14 12 0 
+symbol stack: [SUB, R, ADD, T]
+next symbol: COS
+SHIFT
+
+state stack: 5 16 11 14 12 0 
+symbol stack: [COS, SUB, R, ADD, T]
+next symbol: NUM(4.000000)
+SHIFT
+
+state stack: 1 5 16 11 14 12 0 
+symbol stack: [NUM(4.000000), COS, SUB, R, ADD, T]
+next symbol: FACT
+REDUCE 1
+
+state stack: 8 5 16 11 14 12 0 
+symbol stack: [F, COS, SUB, R, ADD, T]
+next symbol: FACT
+REDUCE 1
+
+state stack: 9 5 16 11 14 12 0 
+symbol stack: [X, COS, SUB, R, ADD, T]
+next symbol: FACT
+SHIFT
+
+state stack: 19 9 5 16 11 14 12 0 
+symbol stack: [FACT, X, COS, SUB, R, ADD, T]
+next symbol: END
+REDUCE 2
+
+state stack: 9 5 16 11 14 12 0 
+symbol stack: [X, COS, SUB, R, ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 28 5 16 11 14 12 0 
+symbol stack: [C, COS, SUB, R, ADD, T]
+next symbol: END
+REDUCE 2
+
+state stack: 10 16 11 14 12 0 
+symbol stack: [C, SUB, R, ADD, T]
+next symbol: END
+REDUCE 1
+
+state stack: 30 16 11 14 12 0 
+symbol stack: [R, SUB, R, ADD, T]
+next symbol: END
+REDUCE 0
+
+state stack: 33 30 16 11 14 12 0 
+symbol stack: [T', R, SUB, R, ADD, T]
+next symbol: END
+REDUCE 3
+
+state stack: 17 11 14 12 0 
+symbol stack: [T', R, ADD, T]
+next symbol: END
+REDUCE 2
+
+state stack: 29 14 12 0 
+symbol stack: [T, ADD, T]
+next symbol: END
+REDUCE 0
+
+state stack: 32 29 14 12 0 
+symbol stack: [E', T, ADD, T]
+next symbol: END
+REDUCE 3
+
+state stack: 15 12 0 
+symbol stack: [E', T]
+next symbol: END
+REDUCE 2
+
+state stack: 13 0 
+symbol stack: [E]
+next symbol: END
+ACCEPT
+
+Parse tree:
+E
+  E'
+    E'
+    T
+      T'
+        T'
+        R
+          C
+            C
+              X
+                FACT
+                X
+                  F
+                    NUM(4.000000)
+            COS
+        SUB
+      R
+        R
+          C
+            X
+              F
+                NUM(3.000000)
+        POW
+        C
+          X
+            F
+              NUM(2.000000)
+    ADD
+  T
+    T'
+    R
+      C
+        X
+          F
+            NUM(1.000000)
+
+- : unit = ()
+

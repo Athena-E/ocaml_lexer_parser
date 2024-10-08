@@ -1,0 +1,112 @@
+# gen_parse_tree "0.01e+5 -  +23" ;;
+
+state stack: 0 
+symbol stack: []
+next symbol: NUM(1000.000000)
+SHIFT
+
+state stack: 1 0 
+symbol stack: [NUM(1000.000000)]
+next symbol: SUB
+REDUCE 1
+
+state stack: 6 0 
+symbol stack: [F]
+next symbol: SUB
+REDUCE 1
+
+state stack: 7 0 
+symbol stack: [X]
+next symbol: SUB
+REDUCE 1
+
+state stack: 8 0 
+symbol stack: [C]
+next symbol: SUB
+REDUCE 1
+
+state stack: 9 0 
+symbol stack: [R]
+next symbol: SUB
+SHIFT
+
+state stack: 14 9 0 
+symbol stack: [SUB, R]
+next symbol: ADD
+SHIFT
+
+state stack: 4 14 9 0 
+symbol stack: [ADD, SUB, R]
+next symbol: NUM(23.000000)
+SHIFT
+
+state stack: 21 4 14 9 0 
+symbol stack: [NUM(23.000000), ADD, SUB, R]
+next symbol: END
+REDUCE 2
+
+state stack: 6 14 9 0 
+symbol stack: [F, SUB, R]
+next symbol: END
+REDUCE 1
+
+state stack: 7 14 9 0 
+symbol stack: [X, SUB, R]
+next symbol: END
+REDUCE 1
+
+state stack: 8 14 9 0 
+symbol stack: [C, SUB, R]
+next symbol: END
+REDUCE 1
+
+state stack: 24 14 9 0 
+symbol stack: [R, SUB, R]
+next symbol: END
+REDUCE 0
+
+state stack: 27 24 14 9 0 
+symbol stack: [T', R, SUB, R]
+next symbol: END
+REDUCE 3
+
+state stack: 15 9 0 
+symbol stack: [T', R]
+next symbol: END
+REDUCE 2
+
+state stack: 10 0 
+symbol stack: [T]
+next symbol: END
+REDUCE 0
+
+state stack: 13 10 0 
+symbol stack: [E', T]
+next symbol: END
+REDUCE 2
+
+state stack: 11 0 
+symbol stack: [E]
+next symbol: END
+ACCEPT
+
+Parse tree:
+E
+  E'
+  T
+    T'
+      T'
+      R
+        C
+          X
+            F
+              NUM(23.000000)
+              ADD
+      SUB
+    R
+      C
+        X
+          F
+            NUM(1000.000000)
+
+- : unit = ()
