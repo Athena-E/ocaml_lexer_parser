@@ -171,9 +171,8 @@ let is_token s = StringMap.mem s token_map || is_N s
 let get_token s = 
   if is_N s then get_N s
   else StringMap.find s token_map
-(*end testing*)
+(*end testing*) 
 
-      
 (*------------------LEXER-------------------*)
 
 let lex s = 
@@ -292,9 +291,7 @@ module GotoMap = Map.Make(struct
     let compare (x1, s1) (x2, s2) =
       let c = compare x1 x2 in
       if c <> 0 then c else compare s1 s2
-  end)    
-
-    
+  end) 
     
 type lr1_item = {
   production : prod_rule;  
@@ -615,6 +612,13 @@ type 'a tree = Br of 'a * 'a tree list
 
 let make_branch sym stack n = Br (sym, take n stack)                       
 
+let rec string_of_tree (Br (value, children)) indent =
+  let prefix = String.make indent ' ' in
+  let children_str = List.map (fun child -> string_of_tree child (indent + 2)) children in
+  prefix ^ (string_of_symbol value) ^ "\n" ^ (String.concat "" children_str) 
+  
+let print_tree t = print_string (string_of_tree (List.nth t 0) 0)       
+
 let gen_parse_tree s = 
   let init = { 
     production = Production (NT Z, [NT E; Te END]);
@@ -628,43 +632,33 @@ let gen_parse_tree s =
   let goto_tbl = get_goto g init in 
   let rec aux state_stack sym_stack syms tree_stack =
     match state_stack, sym_stack, syms with 
-    | x::xs, _, z::zs -> 
+    | x::xs, _, z::zs ->
+        print_string "state stack: ";
         print_int_list state_stack;
         print_endline "";
-        print_symbol_list sym_stack; 
-        print_endline (string_of_symbol z);
+        print_string "symbol stack: ";
+        print_symbol_list sym_stack;
+        print_string "next symbol: ";
+        print_endline (string_of_symbol z); 
         let act = ActionMap.find (x, z) action_tbl in
         let aux' = 
           match act with
           | SHIFT n ->
-              print_endline "shift";
-              print_endline "";
+              print_endline "SHIFT\n"; 
               aux (n::state_stack) (z::sym_stack) zs ((Br (z, []))::tree_stack)
           | REDUCE(m, nt) ->
-              print_endline ("reduce "^(string_of_int m));
+              print_endline ("REDUCE "^(string_of_int m)^"\n"); 
               (match drop m state_stack with
                | st::sts ->
                    let goto_state = GotoMap.find (st, nt) goto_tbl in 
                    aux (goto_state::(st::sts)) (nt::(drop m sym_stack)) syms (Br (nt, take m tree_stack)::(drop m tree_stack))
                | _ -> raise Err)
-          | ACCEPT -> tree_stack (*ACCEPT*) 
+          | ACCEPT -> 
+              print_endline "ACCEPT\n"; 
+              print_endline "Parse tree:";
+              print_tree tree_stack;
           | _ -> raise Err
         in aux' 
     | _, _, _ -> raise Err
   in aux [0] [] sym_list [] 
-
-
-let rec string_of_tree (Br (value, children)) indent =
-  let prefix = String.make indent ' ' in
-  let children_str = List.map (fun child -> string_of_tree child (indent + 2)) children in
-  prefix ^ (string_of_symbol value) ^ "\n" ^ (String.concat "" children_str) 
-  
-let print_tree t = print_string (string_of_tree (List.nth t 0) 0)                                             
-
-
-
-
-
-
-
-    
+   
